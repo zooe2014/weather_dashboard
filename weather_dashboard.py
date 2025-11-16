@@ -1,6 +1,8 @@
 import requests
 import streamlit as st
 import pandas as pd
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # ----------------------------
 # 1️⃣ API 設定
@@ -9,11 +11,17 @@ API_KEY = "CWA-73BC5918-9700-4C6F-9AEE-53D9D5093EA2"
 URL = "https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0003-001"
 
 # ----------------------------
-# 2️⃣ 下載資料
+# 2️⃣ 下載資料（修正 SSL 問題）
 # ----------------------------
 params = {"Authorization": API_KEY}
-response = requests.get(URL, params=params)
+
+session = requests.Session()
+session.verify = False
+session.trust_env = False
+response = session.get(URL, params=params)
+
 data = response.json()
+
 
 stations = data["records"]["Station"]  # 取測站資料
 
